@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab text="Start">
+            <content>
+              <VBox>
+                  <HBox>
+                      <Button fx:id="openButton" text="Open" />
+                      <Button fx:id="renameButton" text="Close" />
+                      <Button fx:id="renameButton" text="Save" />
+                      <Button fx:id="renameButton" text="Save as" />
+                      <Button fx:id="renameButton" text="Rename" />
+                      <Button fx:id="quitButton" text="Quit" />
+                  </HBox>
+              </VBox>
+            </content>
+          </Tab>
+          <Tab text="Personen">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+            <Tab text="Beziehungen">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0" />
+                </content>
+            </Tab>
+            <Tab text="Quellen">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0" />
+                </content>
+            </Tab>
+            <Tab text="Media">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0" />
+                </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+   <bottom>
+      <BorderPane prefHeight="17.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <left>
+            <Label text="Left Status" BorderPane.alignment="CENTER" />
+         </left>
+          <right>
+              <Label text="Right Status" BorderPane.alignment="CENTER" />
+          </right>
+      </BorderPane>
+   </bottom>
+</BorderPane>
