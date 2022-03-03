@@ -12,44 +12,32 @@
 <?import javafx.scene.control.Button?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-        <tabs>
-          <Tab text="Start">
-            <content>
-              <VBox>
-                  <HBox>
-                      <Button fx:id="openButton" text="Open" />
-                      <Button fx:id="renameButton" text="Close" />
-                      <Button fx:id="renameButton" text="Save" />
-                      <Button fx:id="renameButton" text="Save as" />
-                      <Button fx:id="renameButton" text="Rename" />
-                      <Button fx:id="quitButton" text="Quit" />
-                  </HBox>
-              </VBox>
-            </content>
-          </Tab>
-          <Tab text="Personen">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-          </Tab>
-            <Tab text="Beziehungen">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0" />
-                </content>
-            </Tab>
-            <Tab text="Quellen">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0" />
-                </content>
-            </Tab>
-            <Tab text="Media">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0" />
-                </content>
-            </Tab>
-        </tabs>
-      </TabPane>
+       <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+           <Tab text="Start">
+               <VBox>
+                   <HBox>
+                       <Button fx:id="openButton" text="Open"/>
+                       <Button fx:id="closeButton" text="Close"/>
+                       <Button fx:id="saveButton" text="Save"/>
+                       <Button fx:id="saveAsButton" text="Save as"/>
+                       <Button fx:id="renameButton" text="Rename"/>
+                       <Button fx:id="quitButton" text="Quit"/>
+                   </HBox>
+               </VBox>
+           </Tab>
+           <Tab text="Personen">
+               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+           </Tab>
+           <Tab text="Beziehungen">
+               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0"/>
+           </Tab>
+           <Tab text="Quellen">
+               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0"/>
+           </Tab>
+           <Tab text="Media">
+               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0"/>
+           </Tab>
+       </TabPane>
    </center>
    <bottom>
       <BorderPane prefHeight="17.0" prefWidth="600.0" BorderPane.alignment="CENTER">

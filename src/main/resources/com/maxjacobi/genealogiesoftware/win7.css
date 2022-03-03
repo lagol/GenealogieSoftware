@@ -100,10 +100,6 @@
     -fx-stroke-type: inside;
 }
 
-.button{
-    -fx-skin:"org.aerofx.controls.skin.AeroButtonSkin";
-}
-
 .button, .toggle-button{
     -fx-alignment: center;
     -fx-background-color:
@@ -174,7 +170,6 @@
 }
 /* TODO: Style the mark by using a fx-shape */
 .check-box{
-    -fx-skin:"org.aerofx.controls.skin.AeroCheckBoxSkin";
     -fx-label-padding: 0.0em 0.0em 0.0em 0.05em;
 }
 
@@ -244,7 +239,6 @@
 }
 
 .radio-button{
-    -fx-skin:"org.aerofx.controls.skin.AeroRadioButtonSkin";
     -fx-label-padding: 0.0em 0.0em 0.0em 0.35em;
 }
 
@@ -410,9 +404,6 @@
 *       GroupBox                            *
 *                                           *
 *********************************************/
-.group-box{
-    -fx-skin: "org.aerofx.controls.skin.AeroGroupBoxSkin";
-}
 
 .group-box-border{
     -fx-stroke: rgb(213,223,229);
