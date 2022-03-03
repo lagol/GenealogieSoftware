@@ -168,7 +168,7 @@
     -fx-stroke-line-cap: butt;
     -fx-stroke-type: inside;
 }
-/* TODO: Style the mark by using a fx-shape */
+
 .check-box{
     -fx-label-padding: 0.0em 0.0em 0.0em 0.05em;
 }
