@@ -18,11 +18,12 @@
             <content>
               <VBox>
                   <HBox>
-                      <Button text="Open" />
-                      <Button text="Close" />
-                      <Button text="Save" />
-                      <Button text="Save as" />
-                      <Button text="Rename" />
+                      <Button fx:id="openButton" text="Open" />
+                      <Button fx:id="renameButton" text="Close" />
+                      <Button fx:id="renameButton" text="Save" />
+                      <Button fx:id="renameButton" text="Save as" />
+                      <Button fx:id="renameButton" text="Rename" />
+                      <Button fx:id="quitButton" text="Quit" />
                   </HBox>
               </VBox>
             </content>
