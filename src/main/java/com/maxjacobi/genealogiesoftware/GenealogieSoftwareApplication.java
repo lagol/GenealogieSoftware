@@ -13,7 +13,7 @@ public class GenealogieSoftwareApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(GenealogieSoftwareApplication.class.getResource("genealogiesoftware-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 800, 600);
-        scene.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("win7.css")).toString());
+        scene.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
         stage.setTitle("Genealogie Software");
         stage.setScene(scene);
         stage.show();
