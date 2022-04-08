@@ -8,12 +8,12 @@
            <Tab text="Start">
                <VBox>
                    <HBox>
-                       <Button text="Open" />
-                       <Button text="Close" />
-                       <Button text="Save" />
-                       <Button text="Save as" />
-                       <Button text="Rename" />
-                       <Button onAction="#quitApplication" text="Quit" />
+                       <Button text="Öffnen" />
+                       <Button text="Schließen" />
+                       <Button text="Speichern" />
+                       <Button text="Speichern unter" />
+                       <Button text="Umbenennen" />
+                       <Button onAction="#quitApplication" text="Beenden" />
                    </HBox>
                    <TabPane prefHeight="600" tabClosingPolicy="UNAVAILABLE">
                        <Tab text="Datenbank">
