@@ -5,10 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
 
+
 public class GenealogieSoftwareApplication extends Application {
+
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(GenealogieSoftwareApplication.class.getResource("genealogiesoftware-view.fxml"));
@@ -17,9 +22,23 @@ public class GenealogieSoftwareApplication extends Application {
         stage.setTitle("Genealogie Software");
         stage.setScene(scene);
         stage.show();
+        log("Genealogie Software 1.0.0");
     }
 
     public static void main(String[] args) {
         launch();
     }
+
+    public static void newDatabase() {
+
+    }
+
+    public void log(String str) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.io.tmpdir") + "GenealogieSoftware.log", true));
+        writer.append('\n');
+        writer.append(str);
+        writer.close();
+    }
+
+
 }

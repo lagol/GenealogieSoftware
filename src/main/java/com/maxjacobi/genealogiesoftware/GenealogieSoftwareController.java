@@ -15,6 +15,10 @@ public class GenealogieSoftwareController {
     @FXML
     private TableView personsTable;
     @FXML
+    private Label leftInfoLabel;
+    @FXML
+    private Label rightInfoLabel;
+    @FXML
     private Label databaseSizeLabel;
     @FXML
     private Label databaseOwnerLabel;
@@ -22,6 +26,12 @@ public class GenealogieSoftwareController {
     private Label databaseNameLabel;
     @FXML
     private Label databaseChangedLabel;
+
+    public TableColumn nameColumn;
+    public TableColumn sexColumn;
+    public TableColumn idColumn;
+    public TableColumn birthDateColumn;
+    public TableColumn deathDateColumn;
 
     @FXML
     private void initialize() {
@@ -32,17 +42,22 @@ public class GenealogieSoftwareController {
 
         personsTable.setEditable(false);
 
-        TableColumn nameColumn = new TableColumn("Name");
-        TableColumn sexColumn = new TableColumn("Geschlecht");
-        TableColumn idColumn = new TableColumn("ID");
-        TableColumn birthDateColumn = new TableColumn("Geburtsdatum");
-        TableColumn deathDateColumn = new TableColumn("Sterbedatum");
+        nameColumn = new TableColumn("Name");
+        sexColumn = new TableColumn("Geschlecht");
+        idColumn = new TableColumn("ID");
+        birthDateColumn = new TableColumn("Geburtsdatum");
+        deathDateColumn = new TableColumn("Sterbedatum");
 
         personsTable.getColumns().addAll(nameColumn,sexColumn,idColumn,birthDateColumn,deathDateColumn);
 
+       // viewDummyPersonsTable();
+
+    }
+
+    private void viewDummyPersonsTable() {
         final ObservableList<personsTablePerson> data = FXCollections.observableArrayList(
-               new personsTablePerson("Max Jacobi","m","1","2006-03-16",""),
-               new personsTablePerson("Leo Jacobi","m","2","2007-11-15","")
+                new personsTablePerson("Max Jacobi","m","1","2006-03-16",""),
+                new personsTablePerson("Leo Jacobi","m","2","2007-11-15","")
         );
 
         nameColumn.setCellValueFactory(
@@ -62,10 +77,15 @@ public class GenealogieSoftwareController {
         );
 
         personsTable.setItems(data);
-
     }
+
     @FXML
     private void quitApplication() {
         Platform.exit();
     }
+
+    @FXML
+    private void newDatabase() { GenealogieSoftwareApplication.newDatabase(); }
+
+
 }

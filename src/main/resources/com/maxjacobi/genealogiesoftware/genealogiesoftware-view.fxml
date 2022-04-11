@@ -13,6 +13,7 @@
                        <Button text="Speichern" />
                        <Button text="Speichern unter" />
                        <Button text="Umbenennen" />
+                       <Button text="Neu" onAction="#newDatabase" />
                        <Button onAction="#quitApplication" text="Beenden" />
                    </HBox>
                    <TabPane prefHeight="600" tabClosingPolicy="UNAVAILABLE">
@@ -65,10 +66,10 @@
    <bottom>
       <BorderPane prefHeight="17.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <left>
-            <Label text="Left Status" BorderPane.alignment="CENTER" />
+            <Label BorderPane.alignment="CENTER" fx:id="leftInfoLabel" />
          </left>
           <right>
-              <Label text="Right Status" BorderPane.alignment="CENTER" />
+              <Label text="Genealogie Software 1.0.0" BorderPane.alignment="CENTER" fx:id="rightInfoLabel" />
           </right>
       </BorderPane>
    </bottom>
