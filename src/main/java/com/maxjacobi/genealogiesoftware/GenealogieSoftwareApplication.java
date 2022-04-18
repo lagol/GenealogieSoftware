@@ -29,6 +29,13 @@ public class GenealogieSoftwareApplication extends Application {
     TableColumn deathDateColumn = new TableColumn();
     TableView personsTable = new TableView();
 
+    Button closeDatabaseButton = new Button("Schließen");
+    Button saveDatabaseButton = new Button("Speichern");
+    Button saveAsDatabaseButton = new Button("Speichern unter");
+    Button openDatabaseButton = new Button("Öffnen");
+    Button newDatabaseButton = new Button("Neu");
+    Button renameDatabaseButton = new Button("Umbenennen");
+
     Label databaseNameLabel = new Label();
     Label databaseChangedLabel = new Label();
     Label databaseSizeLabel = new Label();
@@ -37,22 +44,22 @@ public class GenealogieSoftwareApplication extends Application {
     @Override
     public void start(Stage stage) {
 
-        Button openDatabaseButton = new Button("Öffnen");
+        openDatabaseButton.setDisable(false);
         openDatabaseButton.setOnAction( ( (event) -> requestDatabasePath() ) );
-        Button closeDatabaseButton = new Button("Schließen");
-        Button saveDatabaseButton = new Button("Speichern");
-        Button saveAsDatabaseButton = new Button("Speichern unter");
-        Button renameDatabaseButton = new Button("Umbenennen");
-        Button newDatabaseButton = new Button("Neu");
+        closeDatabaseButton.setDisable(true);
+        saveDatabaseButton.setDisable(true);
+        saveAsDatabaseButton.setDisable(true);
+        newDatabaseButton.setDisable(false);
         newDatabaseButton.setOnAction(((event) -> newDatabase()));
         Button quitDatabaseButton = new Button("Beenden");
         quitDatabaseButton.setOnAction(((event) -> System.exit(69)));
 
-        HBox databaseManagementButtons = new HBox(openDatabaseButton,closeDatabaseButton,saveDatabaseButton,saveAsDatabaseButton,renameDatabaseButton,newDatabaseButton,quitDatabaseButton);
+        HBox databaseManagementButtons = new HBox(openDatabaseButton,closeDatabaseButton,saveDatabaseButton,saveAsDatabaseButton,newDatabaseButton,quitDatabaseButton);
 
         Label databaseName = new Label("Name:");
+        renameDatabaseButton.setDisable(true);
 
-        HBox databaseInfoNameHBox = new HBox(databaseName,databaseNameLabel);
+        HBox databaseInfoNameHBox = new HBox(databaseName,databaseNameLabel,renameDatabaseButton);
 
         Label databaseChanged = new Label("Änderungsdatum:");
 
@@ -154,6 +161,13 @@ public class GenealogieSoftwareApplication extends Application {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
         }
+
+        closeDatabaseButton.setDisable(false);
+        saveDatabaseButton.setDisable(false);
+        saveAsDatabaseButton.setDisable(false);
+        renameDatabaseButton.setDisable(false);
+        openDatabaseButton.setDisable(true);
+        newDatabaseButton.setDisable(true);
 
         viewDatabaseInfo();
 
