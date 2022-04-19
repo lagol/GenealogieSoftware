@@ -12,17 +12,17 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.sql.*;
 import java.util.Objects;
+import java.util.Optional;
 
 
 public class GenealogieSoftwareApplication extends Application {
     Stage stage;
 
-    Connection c = null;
+    String databaseFilePath;
 
     TableView personsTable = new TableView();
 
     Button closeDatabaseButton = new Button("Schließen");
-    Button saveDatabaseButton = new Button("Speichern");
     Button saveAsDatabaseButton = new Button("Speichern unter");
     Button openDatabaseButton = new Button("Öffnen");
     Button newDatabaseButton = new Button("Neu");
@@ -40,19 +40,26 @@ public class GenealogieSoftwareApplication extends Application {
     public void start(Stage stage) {
 
         openDatabaseButton.setDisable(false);
-        openDatabaseButton.setOnAction( ( (event) -> requestDatabasePath() ) );
+        openDatabaseButton.setOnAction( ( (event) -> {
+            try {
+                openDatabase();
+            } catch (SQLException ignored) {
+
+            }
+        }) );
         closeDatabaseButton.setDisable(true);
-        saveDatabaseButton.setDisable(true);
+        closeDatabaseButton.setOnAction(((event) -> closeDatabase()));
         saveAsDatabaseButton.setDisable(true);
         newDatabaseButton.setDisable(false);
         newDatabaseButton.setOnAction(((event) -> newDatabase()));
         Button quitDatabaseButton = new Button("Beenden");
         quitDatabaseButton.setOnAction(((event) -> System.exit(69)));
 
-        HBox databaseManagementButtons = new HBox(openDatabaseButton,closeDatabaseButton,saveDatabaseButton,saveAsDatabaseButton,newDatabaseButton,quitDatabaseButton);
+        HBox databaseManagementButtons = new HBox(openDatabaseButton,closeDatabaseButton,saveAsDatabaseButton,newDatabaseButton,quitDatabaseButton);
 
         Label databaseName = new Label("Name:");
         renameDatabaseButton.setDisable(true);
+        renameDatabaseButton.setOnAction(((event) -> renameDatabase()));
 
         HBox databaseInfoNameHBox = new HBox(databaseName,databaseNameLabel,renameDatabaseButton);
 
@@ -130,35 +137,9 @@ public class GenealogieSoftwareApplication extends Application {
 
     }
 
-    private void requestDatabasePath() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Datenbank Datei auswählen");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Alle Dateien", "*.*"),
-                new FileChooser.ExtensionFilter("SQLite Datenbank", "*.db")
-        );
-        File file = fileChooser.showOpenDialog(stage);
-        if (file != null) {
-            try {
-                connectDatabase(file.toString());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void connectDatabase(String path) throws SQLException {
-
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:" + path);
-        } catch ( Exception e ) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            System.exit(0);
-        }
-
+    private void openDatabase() throws SQLException {
+        requestDatabasePath();
         closeDatabaseButton.setDisable(false);
-        saveDatabaseButton.setDisable(false);
         saveAsDatabaseButton.setDisable(false);
         renameDatabaseButton.setDisable(false);
         openDatabaseButton.setDisable(true);
@@ -168,28 +149,106 @@ public class GenealogieSoftwareApplication extends Application {
         databaseStatisticsTab.setDisable(false);
 
         viewDatabaseInfo();
+    }
 
+    private void requestDatabasePath() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Datenbank Datei auswählen");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Alle Dateien", "*.*"),
+                new FileChooser.ExtensionFilter("SQLite Datenbank", "*.db")
+        );
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            databaseFilePath = file.toString();
+        }
+    }
+
+    private Connection connectDatabase() throws SQLException {
+
+        Connection c = null;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:" + databaseFilePath);
+            return c;
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+
+        return c;
 
     }
 
-    private void viewDatabaseInfo() {
-        final Connection connection = c;
-        String name = "",changed = "",size = "",owner = "";
-        try(connection) {
-            try(Statement statement = c.createStatement()){
-                String sql = "SELECT * FROM GENERAL";
-                try(ResultSet result = statement.executeQuery(sql)){
-                    while(result.next()) {
-                        name = result.getString("NAME");
-                        changed = result.getString("CHANGEDATE");
-                        size = result.getString("SIZE");
-                        owner = result.getString("OWNER");
+    private void closeDatabase() {
+        databaseNameLabel.setText("");
+        databaseChangedLabel.setText("");
+        databaseSizeLabel.setText("");
+        databaseOwnerLabel.setText("");
+
+        closeDatabaseButton.setDisable(true);
+        saveAsDatabaseButton.setDisable(true);
+        renameDatabaseButton.setDisable(true);
+        openDatabaseButton.setDisable(false);
+        newDatabaseButton.setDisable(false);
+
+        databaseInfoTab.setDisable(true);
+        databaseStatisticsTab.setDisable(true);
+
+        databaseFilePath = "";
+    }
+
+    private void renameDatabase() {
+        String oldName = databaseNameLabel.getText();
+        TextInputDialog dialog = new TextInputDialog(oldName);
+        dialog.setTitle("Datenbankname ändern");
+        dialog.setHeaderText("Geben Sie einen neuen Namen ein:");
+        dialog.setContentText("Name:");
+        DialogPane dialogPaneCss = dialog.getDialogPane();
+        dialogPaneCss.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+        Optional<String> result1 = dialog.showAndWait();
+        result1.ifPresent(newName -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Datenbankname ändern");
+            alert.setHeaderText("Bestätigen Sie die Änderung:");
+            alert.setContentText("Möchten Sie die Datenbank wirklich von '" + oldName + "' in '" + newName + "' umbenennen?");
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+
+            Optional<ButtonType> result2 = alert.showAndWait();
+            if (result2.isPresent()) {
+                if (result2.get() == ButtonType.OK) {
+                    try {
+                        Connection c = connectDatabase();
+                        Statement statement = c.createStatement();
+                        String sql = "UPDATE GENERAL SET NAME='" + newName + "'";
+                        statement.executeUpdate(sql);
+                        viewDatabaseInfo();
+                        c.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                     }
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        });
+    }
+
+    private void viewDatabaseInfo() throws SQLException {
+        Connection c = connectDatabase();
+        String name = "",changed = "",size = "",owner = "";
+        try(Statement statement = c.createStatement()){
+            String sql = "SELECT * FROM GENERAL";
+            try(ResultSet result = statement.executeQuery(sql)){
+                while(result.next()) {
+                    name = result.getString("NAME");
+                    changed = result.getString("CHANGEDATE");
+                    size = result.getString("SIZE");
+                    owner = result.getString("OWNER");
+                }
+            }
         }
+
 
         databaseNameLabel.setText(name);
         databaseChangedLabel.setText(changed);
