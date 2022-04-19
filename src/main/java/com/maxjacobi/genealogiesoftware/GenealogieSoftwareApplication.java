@@ -1,11 +1,8 @@
 package com.maxjacobi.genealogiesoftware;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,11 +19,6 @@ public class GenealogieSoftwareApplication extends Application {
 
     Connection c = null;
 
-    TableColumn nameColumn = new TableColumn();
-    TableColumn sexColumn = new TableColumn();
-    TableColumn idColumn = new TableColumn();
-    TableColumn birthDateColumn = new TableColumn();
-    TableColumn deathDateColumn = new TableColumn();
     TableView personsTable = new TableView();
 
     Button closeDatabaseButton = new Button("Schließen");
@@ -35,6 +27,9 @@ public class GenealogieSoftwareApplication extends Application {
     Button openDatabaseButton = new Button("Öffnen");
     Button newDatabaseButton = new Button("Neu");
     Button renameDatabaseButton = new Button("Umbenennen");
+
+    Tab databaseStatisticsTab = new Tab("Statistiken");
+    Tab databaseInfoTab = new Tab("Datenbank");
 
     Label databaseNameLabel = new Label();
     Label databaseChangedLabel = new Label();
@@ -75,9 +70,9 @@ public class GenealogieSoftwareApplication extends Application {
 
         VBox databaseInfoVBox = new VBox(databaseInfoNameHBox,databaseInfoChanged,databaseInfoSize,databaseInfoOwner);
 
-        Tab databaseInfoTab = new Tab("Datenbank",databaseInfoVBox);
-
-        Tab databaseStatisticsTab = new Tab("Statistiken");
+        databaseInfoTab.setContent(databaseInfoVBox);
+        databaseInfoTab.setDisable(true);
+        databaseStatisticsTab.setDisable(true);
 
         TabPane databaseInfoTabPane = new TabPane(databaseInfoTab,databaseStatisticsTab);
         databaseInfoTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -169,34 +164,12 @@ public class GenealogieSoftwareApplication extends Application {
         openDatabaseButton.setDisable(true);
         newDatabaseButton.setDisable(true);
 
+        databaseInfoTab.setDisable(false);
+        databaseStatisticsTab.setDisable(false);
+
         viewDatabaseInfo();
 
 
-    }
-
-    private void viewDummyPersonsTable() {
-        final ObservableList<personsTablePerson> data = FXCollections.observableArrayList(
-                new personsTablePerson("Max Jacobi","m","1","2006-03-16",""),
-                new personsTablePerson("Leo Jacobi","m","2","2007-11-15","")
-        );
-
-        nameColumn.setCellValueFactory(
-                new PropertyValueFactory<personsTablePerson,String>("name")
-        );
-        sexColumn.setCellValueFactory(
-                new PropertyValueFactory<personsTablePerson,String>("sex")
-        );
-        idColumn.setCellValueFactory(
-                new PropertyValueFactory<personsTablePerson,String>("id")
-        );
-        birthDateColumn.setCellValueFactory(
-                new PropertyValueFactory<personsTablePerson,String>("birthDate")
-        );
-        deathDateColumn.setCellValueFactory(
-                new PropertyValueFactory<personsTablePerson,String>("deathDate")
-        );
-
-       personsTable.setItems(data);
     }
 
     private void viewDatabaseInfo() {
