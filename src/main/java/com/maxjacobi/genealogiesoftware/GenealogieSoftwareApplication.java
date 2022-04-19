@@ -77,8 +77,15 @@ public class GenealogieSoftwareApplication extends Application {
 
         VBox databaseInfoVBox = new VBox(databaseInfoNameHBox,databaseInfoChanged,databaseInfoSize,databaseInfoOwner);
 
+        Label databaseNumberOfPersons = new Label("Anzahl Personen:");
+
+        HBox databaseStatisticsNumberOfPersons = new HBox(databaseNumberOfPersons);
+
+        VBox databaseStatisticsVBox = new VBox(databaseStatisticsNumberOfPersons);
+
         databaseInfoTab.setContent(databaseInfoVBox);
         databaseInfoTab.setDisable(true);
+        databaseStatisticsTab.setContent(databaseStatisticsVBox);
         databaseStatisticsTab.setDisable(true);
 
         TabPane databaseInfoTabPane = new TabPane(databaseInfoTab,databaseStatisticsTab);
