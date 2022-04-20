@@ -36,6 +36,11 @@ public class GenealogieSoftwareApplication extends Application {
     Label databaseSizeLabel = new Label();
     Label databaseOwnerLabel = new Label();
 
+    Label databaseNumberOfPersonsLabel = new Label();
+    Label databaseNumberOfMalePersonsLabel = new Label();
+    Label databaseNumberOfFemalePersonsLabel = new Label();
+    Label databaseNumberOfFamiliesLabel = new Label();
+
     @Override
     public void start(Stage stage) {
 
@@ -79,9 +84,21 @@ public class GenealogieSoftwareApplication extends Application {
 
         Label databaseNumberOfPersons = new Label("Anzahl Personen:");
 
-        HBox databaseStatisticsNumberOfPersons = new HBox(databaseNumberOfPersons);
+        HBox databaseStatisticsNumberOfPersons = new HBox(databaseNumberOfPersons,databaseNumberOfPersonsLabel);
 
-        VBox databaseStatisticsVBox = new VBox(databaseStatisticsNumberOfPersons);
+        Label databaseNumberOfMalePersons = new Label("davon männlich:");
+
+        HBox databaseStatisticsNumberOfMalePersons = new HBox(databaseNumberOfMalePersons,databaseNumberOfMalePersonsLabel);
+
+        Label databaseNumberOfFemalePersons = new Label("davon weiblich:");
+
+        HBox databaseStatisticsNumberOfFemalePersons = new HBox(databaseNumberOfFemalePersons,databaseNumberOfFemalePersonsLabel);
+
+        Label databaseNumberOfFamilies = new Label("Anzahl Familien:");
+
+        HBox databaseStatisticsNumberOfFamilies = new HBox(databaseNumberOfFamilies,databaseNumberOfFamiliesLabel);
+
+        VBox databaseStatisticsVBox = new VBox(databaseStatisticsNumberOfPersons,databaseStatisticsNumberOfMalePersons,databaseStatisticsNumberOfFemalePersons,databaseStatisticsNumberOfFamilies);
 
         databaseInfoTab.setContent(databaseInfoVBox);
         databaseInfoTab.setDisable(true);
@@ -156,6 +173,7 @@ public class GenealogieSoftwareApplication extends Application {
         databaseStatisticsTab.setDisable(false);
 
         viewDatabaseInfo();
+        viewDatabaseStatistics();
     }
 
     private void requestDatabasePath() {
@@ -256,11 +274,49 @@ public class GenealogieSoftwareApplication extends Application {
             }
         }
 
+        c.close();
 
         databaseNameLabel.setText(name);
         databaseChangedLabel.setText(changed);
         databaseSizeLabel.setText(size);
         databaseOwnerLabel.setText(owner);
+
+    }
+
+    private void viewDatabaseStatistics() throws SQLException {
+        Connection c = connectDatabase();
+        int personsCounter = 102, malesCounter = 50, femalesCounter = 52;
+        try(Statement statement = c.createStatement()) {
+            String sql = "SELECT * FROM PERSON";
+            try(ResultSet result = statement.executeQuery(sql)) {
+                while(result.next()) {
+                    personsCounter++;
+                    if (result.getString("SEX").equals("M")) {
+                        malesCounter++;
+                    } else if (result.getString("SEX").equals("F")) {
+                        femalesCounter++;
+                    }
+                }
+            }
+        }
+        double malePercentage = (double) malesCounter / (double) personsCounter * 100;
+        double femalePercentage = (double) femalesCounter / (double) personsCounter * 100;
+        databaseNumberOfPersonsLabel.setText(Integer.toString(personsCounter));
+        databaseNumberOfMalePersonsLabel.setText(malesCounter + " (" + malePercentage + "%)");
+        databaseNumberOfFemalePersonsLabel.setText(femalesCounter + " (" + femalePercentage + "%)");
+
+        int familiesCounter = 20;
+        try(Statement statement = c.createStatement()) {
+            String sql = "SELECT * FROM FAMILY";
+            try (ResultSet result = statement.executeQuery(sql)) {
+                while (result.next()) {
+                    familiesCounter++;
+                }
+            }
+        }
+        databaseNumberOfFamiliesLabel.setText(Integer.toString(familiesCounter));
+
+        c.close();
 
     }
 
