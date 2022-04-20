@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.math3.util.Precision;
 
 import java.io.File;
 import java.sql.*;
@@ -285,7 +286,7 @@ public class GenealogieSoftwareApplication extends Application {
 
     private void viewDatabaseStatistics() throws SQLException {
         Connection c = connectDatabase();
-        int personsCounter = 102, malesCounter = 50, femalesCounter = 52;
+        int personsCounter = 0, malesCounter = 0, femalesCounter = 0;
         try(Statement statement = c.createStatement()) {
             String sql = "SELECT * FROM PERSON";
             try(ResultSet result = statement.executeQuery(sql)) {
@@ -299,13 +300,13 @@ public class GenealogieSoftwareApplication extends Application {
                 }
             }
         }
-        double malePercentage = (double) malesCounter / (double) personsCounter * 100;
-        double femalePercentage = (double) femalesCounter / (double) personsCounter * 100;
+        double malePercentage = Precision.round((double) malesCounter / (double) personsCounter * 100, 1);
+        double femalePercentage = Precision.round((double) femalesCounter / (double) personsCounter * 100,1);
         databaseNumberOfPersonsLabel.setText(Integer.toString(personsCounter));
         databaseNumberOfMalePersonsLabel.setText(malesCounter + " (" + malePercentage + "%)");
         databaseNumberOfFemalePersonsLabel.setText(femalesCounter + " (" + femalePercentage + "%)");
 
-        int familiesCounter = 20;
+        int familiesCounter = 0;
         try(Statement statement = c.createStatement()) {
             String sql = "SELECT * FROM FAMILY";
             try (ResultSet result = statement.executeQuery(sql)) {
