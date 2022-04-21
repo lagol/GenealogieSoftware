@@ -138,11 +138,23 @@ public class GenealogieSoftwareApplication extends Application {
         deathColumn.setPrefWidth(200.0);
 
         Button personsAddPerson = new Button("Hinzufügen");
-        personsAddPerson.setOnAction(((event) -> editPerson("new")));
+        personsAddPerson.setOnAction(((event) -> {
+            try {
+                editPerson("new");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }));
         Button personsRemovePerson = new Button("Entfernen");
         personsRemovePerson.setOnAction(((event) -> removePerson()));
         Button personsEditPerson = new Button("Bearbeiten");
-        personsEditPerson.setOnAction(((event) -> editPerson("edit")));
+        personsEditPerson.setOnAction(((event) -> {
+            try {
+                editPerson("edit");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }));
         ToolBar personsToolbar = new ToolBar(personsAddPerson,personsRemovePerson,personsEditPerson);
 
         personsTable.getColumns().add(nameColumn);
@@ -454,7 +466,7 @@ public class GenealogieSoftwareApplication extends Application {
         c.close();
     }
 
-    private void editPerson(String how) {
+    private void editPerson(String how) throws SQLException {
 
         Button editPersonConfirm = new Button("Okay");
         Button editPersonCancel = new Button("Abbrechen");
@@ -559,6 +571,28 @@ public class GenealogieSoftwareApplication extends Application {
         editPersonStage.setScene(editPersonScene);
         editPersonStage.show();
         editPersonCancel.setOnAction(((event) -> editPersonStage.close()));
+
+        if (how.equals("edit")) {
+            String personId = personsTable.getItems().get(personsTable.getSelectionModel().getSelectedIndex()).getId();
+            Connection c = connectDatabase();
+            try(Statement statement = c.createStatement()) {
+                String sql = "SELECT TITLE,GIVENNAMES,CALLNAME,NICKNAME,PREFIX,LASTNAME,SUFFIX,ORIGIN,TYPE FROM NAME WHERE PID='" + personId + "' LIMIT 1";
+                try(ResultSet result = statement.executeQuery(sql)) {
+                    while(result.next()) {
+                        editNameTitleField.setText(result.getString("TITLE"));
+                        editNameGivenNamesField.setText(result.getString("GIVENNAMES"));
+                        editNameCallNameField.setText(result.getString("CALLNAME"));
+                        editNameNickNameField.setText(result.getString("NICKNAME"));
+                        editNamePrefixField.setText(result.getString("PREFIX"));
+                        editNameLastNameField.setText(result.getString("LASTNAME"));
+                        editNameSuffixField.setText(result.getString("SUFFIX"));
+                        editNameOriginField.setText(result.getString("ORIGIN"));
+                    }
+                }
+            }
+            c.close();
+        }
+
     }
 
     private void removePerson() {
