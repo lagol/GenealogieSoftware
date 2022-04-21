@@ -3,6 +3,7 @@ package com.maxjacobi.genealogiesoftware;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -23,7 +24,7 @@ public class GenealogieSoftwareApplication extends Application {
 
     String databaseFilePath;
 
-    TableView personsTable = new TableView();
+    TableView<personsTablePerson> personsTable = new TableView<>();
 
     Button closeDatabaseButton = new Button("Schließen");
     Button saveAsDatabaseButton = new Button("Speichern unter");
@@ -118,6 +119,27 @@ public class GenealogieSoftwareApplication extends Application {
 
         Tab rootStartTab = new Tab("Start",rootStartVBox);
 
+        TableColumn<personsTablePerson,String> nameColumn = new TableColumn<>("Name");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameColumn.setPrefWidth(250);
+        TableColumn<personsTablePerson,String> sexColumn = new TableColumn<>("Geschlecht");
+        sexColumn.setCellValueFactory(new PropertyValueFactory<>("sex"));
+        sexColumn.setPrefWidth(75);
+        TableColumn<personsTablePerson,String> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        idColumn.setPrefWidth(75);
+        TableColumn<personsTablePerson,String> birthColumn = new TableColumn<>("Geburt");
+        birthColumn.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+        birthColumn.setPrefWidth(200.0);
+        TableColumn<personsTablePerson,String> deathColumn = new TableColumn<>("Tod");
+        deathColumn.setCellValueFactory(new PropertyValueFactory<>("deathDate"));
+        deathColumn.setPrefWidth(200.0);
+
+        personsTable.getColumns().add(nameColumn);
+        personsTable.getColumns().add(sexColumn);
+        personsTable.getColumns().add(idColumn);
+        personsTable.getColumns().add(birthColumn);
+        personsTable.getColumns().add(deathColumn);
         personsTable.setEditable(false);
         personsTable.setDisable(true);
         personsTable.setPrefHeight(600.0);
