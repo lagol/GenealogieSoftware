@@ -478,6 +478,13 @@ public class GenealogieSoftwareApplication extends Application {
         editSexOtherField.setPrefWidth(175.0);
         HBox editPersonSex = new HBox(editSex,maleSexButton,femaleSexButton,otherSexButton,editSexOtherField);
 
+        Label editNameType = new Label("Typ:");
+        editNameType.setPrefWidth(100.0);
+        ComboBox<String> nameTypeSelector = new ComboBox<>();
+        nameTypeSelector.getItems().addAll("","Geburtsname","Adoptivname","Ehename","Taufname");
+        nameTypeSelector.setPrefWidth(700.0);
+        HBox editPersonNameType = new HBox(editNameType,nameTypeSelector);
+
         Label editNameTitle = new Label("Titel:");
         editNameTitle.setPrefWidth(100.0);
         TextField editNameTitleField = new TextField();
@@ -490,7 +497,50 @@ public class GenealogieSoftwareApplication extends Application {
         editNameGivenNamesField.setPrefWidth(700.0);
         HBox editPersonNameGivenNames = new HBox(editNameGivenNames,editNameGivenNamesField);
 
-        VBox editPersonVBox = new VBox(editPersonSex,editPersonNameTitle,editPersonNameGivenNames);
+        Label editNameCallName = new Label("Rufname:");
+        editNameCallName.setPrefWidth(100.0);
+        TextField editNameCallNameField = new TextField();
+        editNameCallNameField.setPrefWidth(700.0);
+        HBox editPersonNameCallName = new HBox(editNameCallName,editNameCallNameField);
+
+        Label editNameNickName = new Label("Spitzname:");
+        editNameNickName.setPrefWidth(100.0);
+        TextField editNameNickNameField = new TextField();
+        editNameNickNameField.setPrefWidth(700.0);
+        HBox editPersonNameNickName = new HBox(editNameNickName,editNameNickNameField);
+
+        Label editNamePrefix = new Label("Präfix:");
+        editNamePrefix.setPrefWidth(100.0);
+        TextField editNamePrefixField = new TextField();
+        editNamePrefixField.setPrefWidth(700.0);
+        HBox editPersonNamePrefix = new HBox(editNamePrefix,editNamePrefixField);
+
+        Label editNameLastName = new Label("Nachname:");
+        editNameLastName.setPrefWidth(100.0);
+        TextField editNameLastNameField = new TextField();
+        editNameLastNameField.setPrefWidth(700.0);
+        HBox editPersonNameLastName = new HBox(editNameLastName,editNameLastNameField);
+
+        Label editNameSuffix = new Label("Suffix:");
+        editNameSuffix.setPrefWidth(100.0);
+        TextField editNameSuffixField = new TextField();
+        editNameSuffixField.setPrefWidth(700.0);
+        HBox editPersonNameSuffix = new HBox(editNameSuffix,editNameSuffixField);
+
+        Label editNameOrigin = new Label("Herkunft:");
+        editNameOrigin.setPrefWidth(100.0);
+        TextField editNameOriginField = new TextField();
+        editNameOriginField.setPrefWidth(700.0);
+        HBox editPersonNameOrigin = new HBox(editNameOrigin,editNameOriginField);
+
+        Tab editPersonEvents = new Tab("Ereignisse");
+        Tab editPersonNames = new Tab("Namen");
+        Tab editPersonSources = new Tab("Quellen");
+        Tab editPersonMedia = new Tab("Medien");
+        TabPane editPersonTabPane = new TabPane(editPersonEvents,editPersonNames,editPersonSources,editPersonMedia);
+        editPersonTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        VBox editPersonVBox = new VBox(editPersonSex,editPersonNameType,editPersonNameTitle,editPersonNameGivenNames,editPersonNameCallName,editPersonNameNickName,editPersonNamePrefix,editPersonNameLastName,editPersonNameSuffix,editPersonNameOrigin,editPersonTabPane);
         editPersonVBox.setPrefHeight(587.0);
 
         BorderPane editPersonBorderPane = new BorderPane();
