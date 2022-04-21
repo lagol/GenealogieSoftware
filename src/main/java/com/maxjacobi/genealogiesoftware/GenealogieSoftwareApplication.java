@@ -484,7 +484,13 @@ public class GenealogieSoftwareApplication extends Application {
         editNameTitleField.setPrefWidth(700.0);
         HBox editPersonNameTitle = new HBox(editNameTitle,editNameTitleField);
 
-        VBox editPersonVBox = new VBox(editPersonSex,editPersonNameTitle);
+        Label editNameGivenNames = new Label("Vorname(n):");
+        editNameGivenNames.setPrefWidth(100.0);
+        TextField editNameGivenNamesField = new TextField();
+        editNameGivenNamesField.setPrefWidth(700.0);
+        HBox editPersonNameGivenNames = new HBox(editNameGivenNames,editNameGivenNamesField);
+
+        VBox editPersonVBox = new VBox(editPersonSex,editPersonNameTitle,editPersonNameGivenNames);
         editPersonVBox.setPrefHeight(587.0);
 
         BorderPane editPersonBorderPane = new BorderPane();
