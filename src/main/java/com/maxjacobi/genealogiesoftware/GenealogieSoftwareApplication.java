@@ -571,6 +571,134 @@ public class GenealogieSoftwareApplication extends Application {
         editPersonStage.setScene(editPersonScene);
         editPersonStage.show();
         editPersonCancel.setOnAction(((event) -> editPersonStage.close()));
+        editPersonConfirm.setOnAction(((event) -> {
+            if (how.equals("edit")) {
+                String personId = personsTable.getItems().get(personsTable.getSelectionModel().getSelectedIndex()).getId();
+                String sex;
+                if (maleSexButton.isSelected()) {
+                    sex = "M";
+                } else if (femaleSexButton.isSelected()) {
+                    sex = "F";
+                } else {
+                    sex = editSexOtherField.getText();
+                }
+                LocalDateTime dateTime = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm");
+                String formattedDateTime = dateTime.format(formatter);
+                String nameType = "";
+                if (nameTypeSelector.getSelectionModel().getSelectedItem() != null) {
+                    switch (nameTypeSelector.getSelectionModel().getSelectedItem()) {
+                        case "Geburtsname" -> nameType = "birth";
+                        case "Ehename" -> nameType = "marriage";
+                        case "Adoptivname" -> nameType = "adoption";
+                        default -> nameType = "";
+                    }
+                }
+                try {
+                    Connection c = connectDatabase();
+                    Statement statement = c.createStatement();
+                    String sql = "UPDATE PERSON SET SEX='" + sex + "',CHANGEDATE='" + formattedDateTime + "' WHERE ID='" + personId + "'";
+                    statement.executeUpdate(sql);
+                    sql = "SELECT ID FROM NAME WHERE PID='" + personId + "'";
+                    ResultSet result = statement.executeQuery(sql);
+                    String nameId = result.getString("ID");
+                    sql = "UPDATE NAME SET LASTNAME='" + editNameLastNameField.getText() + "',PREFIX='" + editNamePrefixField.getText() + "',GIVENNAMES='" + editNameGivenNamesField.getText() + "',CALLNAME='" + editNameCallNameField.getText() + "',NICKNAME='" + editNameNickNameField.getText() + "',SUFFIX='" + editNameSuffixField.getText() + "',TITLE='" + editNameTitleField.getText() + "',ORIGIN='" + editNameOriginField.getText() + "',TYPE='" + nameType + "',CHANGEDATE='" + formattedDateTime + "' WHERE ID='" + nameId + "'";
+                    statement.executeUpdate(sql);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            } else if (how.equals("new")) {
+                String personId = "";
+                try {
+                    Connection c = connectDatabase();
+                    Statement statement = c.createStatement();
+                    String sql = "SELECT * FROM PERSON";
+                    ResultSet result = statement.executeQuery(sql);
+                    int personsCounter = 0;
+                    while (result.next()) {
+                        personsCounter++;
+                    }
+                    while (statement.executeQuery("SELECT * FROM PERSON WHERE ID='P" + personsCounter + "'").next()) {
+                        personsCounter++;
+                    }
+                    personId = "P" + personsCounter;
+                    c.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                String sex;
+                if (maleSexButton.isSelected()) {
+                    sex = "M";
+                } else if (femaleSexButton.isSelected()) {
+                    sex = "F";
+                } else {
+                    sex = editSexOtherField.getText();
+                }
+                LocalDateTime dateTime = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm");
+                String formattedDateTime = dateTime.format(formatter);
+                String nameType = "";
+                if (nameTypeSelector.getSelectionModel().getSelectedItem() != null) {
+                    switch (nameTypeSelector.getSelectionModel().getSelectedItem()) {
+                        case "Geburtsname" -> nameType = "birth";
+                        case "Ehename" -> nameType = "marriage";
+                        case "Adoptivname" -> nameType = "adoption";
+                        default -> nameType = "";
+                    }
+                }
+                try {
+                    Connection c = connectDatabase();
+                    Statement statement = c.createStatement();
+                    String sql = "INSERT INTO PERSON(ID,SEX,CHANGEDATE) VALUES('" + personId + "','" + sex + "','" + formattedDateTime + "')";
+                    statement.executeUpdate(sql);
+                    String nameId = "";
+                    try {
+                        sql = "SELECT * FROM NAME";
+                        ResultSet result = statement.executeQuery(sql);
+                        int namesCounter = 0;
+                        while (result.next()) {
+                            namesCounter++;
+                        }
+                        while (statement.executeQuery("SELECT * FROM NAME WHERE ID='X" + namesCounter + "'").next()) {
+                            namesCounter++;
+                        }
+                        nameId = "X" + namesCounter;
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    String lastName = "",prefix="",givenNames="",callName="",nickName="",suffix="",title="",origin="";
+                    if (editNameLastNameField.getText() != null)
+                        lastName = editNameLastNameField.getText();
+                    if (editNamePrefixField.getText() != null)
+                        prefix = editNamePrefixField.getText();
+                    if (editNameGivenNamesField.getText() != null)
+                        givenNames = editNameGivenNamesField.getText();
+                    if (editNameCallNameField.getText() != null)
+                        callName = editNameCallNameField.getText();
+                    if (editNameNickNameField.getText() != null)
+                        nickName = editNameNickNameField.getText();
+                    if (editNameSuffixField.getText() != null)
+                        suffix = editNameSuffixField.getText();
+                    if (editNameTitleField.getText() != null)
+                        title = editNameTitleField.getText();
+                    if (editNameOriginField.getText() != null)
+                        origin = editNameOriginField.getText();
+                    sql = "INSERT INTO NAME(ID,LASTNAME,PREFIX,GIVENNAMES,CALLNAME,NICKNAME,SUFFIX,TITLE,ORIGIN,TYPE,CHANGEDATE,PID) VALUES('" + nameId + "','" + lastName + "','" + prefix + "','" + givenNames + "','" + callName + "','" + nickName + "','" + suffix + "','" + title + "','" + origin + "','" + nameType + "','" + formattedDateTime + "','" + personId + "')";
+                    statement.executeUpdate(sql);
+                    c.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                writeDatabaseInfo();
+                viewDatabaseStatistics();
+                viewPersonsTable();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            editPersonStage.close();
+        }));
 
         if (how.equals("edit")) {
             String personId = personsTable.getItems().get(personsTable.getSelectionModel().getSelectedIndex()).getId();
@@ -579,14 +707,45 @@ public class GenealogieSoftwareApplication extends Application {
                 String sql = "SELECT TITLE,GIVENNAMES,CALLNAME,NICKNAME,PREFIX,LASTNAME,SUFFIX,ORIGIN,TYPE FROM NAME WHERE PID='" + personId + "' LIMIT 1";
                 try(ResultSet result = statement.executeQuery(sql)) {
                     while(result.next()) {
-                        editNameTitleField.setText(result.getString("TITLE"));
+                        if(result.getString("TITLE") != null)
+                            editNameTitleField.setText(result.getString("TITLE"));
+                        if(result.getString("GIVENNAMES") != null)
                         editNameGivenNamesField.setText(result.getString("GIVENNAMES"));
+                        if(result.getString("CALLNAME") != null)
                         editNameCallNameField.setText(result.getString("CALLNAME"));
+                        if(result.getString("NICKNAME") != null)
                         editNameNickNameField.setText(result.getString("NICKNAME"));
+                        if(result.getString("PREFIX") != null)
                         editNamePrefixField.setText(result.getString("PREFIX"));
+                        if(result.getString("LASTNAME") != null)
                         editNameLastNameField.setText(result.getString("LASTNAME"));
+                        if(result.getString("SUFFIX") != null)
                         editNameSuffixField.setText(result.getString("SUFFIX"));
+                        if(result.getString("ORIGIN") != null)
                         editNameOriginField.setText(result.getString("ORIGIN"));
+                        if (result.getString("TYPE") != null) {
+                            switch (result.getString("TYPE")) {
+                                case "birth" -> nameTypeSelector.getSelectionModel().select("Geburtsname");
+                                case "marriage" -> nameTypeSelector.getSelectionModel().select("Ehename");
+                                case "adoption" -> nameTypeSelector.getSelectionModel().select("Adoptivname");
+                                default -> nameTypeSelector.getSelectionModel().selectFirst();
+                            }
+                        }
+                    }
+                }
+            }
+            try(Statement statement = c.createStatement()) {
+                String sql = "SELECT SEX FROM PERSON WHERE ID='" + personId + "'";
+                try(ResultSet result = statement.executeQuery(sql)) {
+                    while (result.next()) {
+                        switch (result.getString("SEX")) {
+                            case "M" -> maleSexButton.setSelected(true);
+                            case "F" -> femaleSexButton.setSelected(true);
+                            default -> {
+                                otherSexButton.setSelected(true);
+                                editSexOtherField.setText(result.getString("SEX"));
+                            }
+                        }
                     }
                 }
             }
