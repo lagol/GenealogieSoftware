@@ -137,6 +137,14 @@ public class GenealogieSoftwareApplication extends Application {
         deathColumn.setCellValueFactory(new PropertyValueFactory<>("deathDate"));
         deathColumn.setPrefWidth(200.0);
 
+        Button personsAddPerson = new Button("Hinzufügen");
+        personsAddPerson.setOnAction(((event) -> editPerson("new")));
+        Button personsRemovePerson = new Button("Entfernen");
+        personsRemovePerson.setOnAction(((event) -> removePerson()));
+        Button personsEditPerson = new Button("Bearbeiten");
+        personsEditPerson.setOnAction(((event) -> editPerson("edit")));
+        ToolBar personsToolbar = new ToolBar(personsAddPerson,personsRemovePerson,personsEditPerson);
+
         personsTable.getColumns().add(nameColumn);
         personsTable.getColumns().add(sexColumn);
         personsTable.getColumns().add(idColumn);
@@ -146,7 +154,7 @@ public class GenealogieSoftwareApplication extends Application {
         personsTable.setDisable(true);
         personsTable.setPrefHeight(600.0);
 
-        VBox rootPersonsVBox = new VBox(personsTable);
+        VBox rootPersonsVBox = new VBox(personsToolbar,personsTable);
 
         Tab rootPersonsTab = new Tab("Personen",rootPersonsVBox);
 
@@ -165,7 +173,6 @@ public class GenealogieSoftwareApplication extends Application {
         Label rightInfoLabel = new Label("Genealogie Software 1.0.0");
 
         BorderPane rootFooterPane = new BorderPane();
-        rootFooterPane.setPrefWidth(600.0);
         rootFooterPane.setPrefHeight(13.0);
         rootFooterPane.setLeft(leftInfoLabel);
         rootFooterPane.setRight(rightInfoLabel);
@@ -445,6 +452,61 @@ public class GenealogieSoftwareApplication extends Application {
         }
         personsTable.setItems(data);
         c.close();
+    }
+
+    private void editPerson(String how) {
+
+        Button editPersonConfirm = new Button("Okay");
+        Button editPersonCancel = new Button("Abbrechen");
+        ToolBar editPersonConfirmButtons = new ToolBar(editPersonCancel,editPersonConfirm);
+
+        BorderPane editPersonConfirmBorderPane = new BorderPane();
+        editPersonConfirmBorderPane.setPrefHeight(13.0);
+        editPersonConfirmBorderPane.setRight(editPersonConfirmButtons);
+
+        Label editSex = new Label("Geschlecht:");
+        editSex.setPrefWidth(100.0);
+        RadioButton maleSexButton = new RadioButton("Männlich");
+        maleSexButton.setPrefWidth(175.0);
+        RadioButton femaleSexButton = new RadioButton("Weiblich");
+        femaleSexButton.setPrefWidth(175.0);
+        RadioButton otherSexButton = new RadioButton("Anderes:");
+        otherSexButton.setPrefWidth(175.0);
+        ToggleGroup sexSelector = new ToggleGroup();
+        sexSelector.getToggles().addAll(maleSexButton,femaleSexButton,otherSexButton);
+        TextField editSexOtherField = new TextField();
+        editSexOtherField.setPrefWidth(175.0);
+        HBox editPersonSex = new HBox(editSex,maleSexButton,femaleSexButton,otherSexButton,editSexOtherField);
+
+        Label editNameTitle = new Label("Titel:");
+        editNameTitle.setPrefWidth(100.0);
+        TextField editNameTitleField = new TextField();
+        editNameTitleField.setPrefWidth(700.0);
+        HBox editPersonNameTitle = new HBox(editNameTitle,editNameTitleField);
+
+        VBox editPersonVBox = new VBox(editPersonSex,editPersonNameTitle);
+        editPersonVBox.setPrefHeight(587.0);
+
+        BorderPane editPersonBorderPane = new BorderPane();
+        editPersonBorderPane.setPrefHeight(600.0);
+        editPersonBorderPane.setCenter(editPersonVBox);
+        editPersonBorderPane.setBottom(editPersonConfirmBorderPane);
+
+        Scene editPersonScene = new Scene(editPersonBorderPane,800,600);
+        editPersonScene.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+        Stage editPersonStage = new Stage();
+        if (how.equals("new")) {
+            editPersonStage.setTitle("Person hinzufügen");
+        } else {
+            editPersonStage.setTitle("Person bearbeiten");
+        }
+        editPersonStage.setScene(editPersonScene);
+        editPersonStage.show();
+        editPersonCancel.setOnAction(((event) -> editPersonStage.close()));
+    }
+
+    private void removePerson() {
+
     }
 
 }
