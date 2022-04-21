@@ -12,6 +12,8 @@ import org.apache.commons.math3.util.Precision;
 
 import java.io.File;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,6 +30,7 @@ public class GenealogieSoftwareApplication extends Application {
     Button openDatabaseButton = new Button("Öffnen");
     Button newDatabaseButton = new Button("Neu");
     Button renameDatabaseButton = new Button("Umbenennen");
+    Button changeOwnerButton = new Button("Ändern");
 
     Tab databaseStatisticsTab = new Tab("Statistiken");
     Tab databaseInfoTab = new Tab("Datenbank");
@@ -77,9 +80,11 @@ public class GenealogieSoftwareApplication extends Application {
 
         HBox databaseInfoSize = new HBox(databaseSize,databaseSizeLabel);
 
-        Label databaseOwner = new Label("Besitzer:");
+        Label databaseOwner = new Label("Besitzer:in:");
+        changeOwnerButton.setDisable(true);
+        changeOwnerButton.setOnAction(((event) -> changeDatabaseOwnerInfo()));
 
-        HBox databaseInfoOwner = new HBox(databaseOwner,databaseOwnerLabel);
+        HBox databaseInfoOwner = new HBox(databaseOwner,databaseOwnerLabel,changeOwnerButton);
 
         VBox databaseInfoVBox = new VBox(databaseInfoNameHBox,databaseInfoChanged,databaseInfoSize,databaseInfoOwner);
 
@@ -113,6 +118,8 @@ public class GenealogieSoftwareApplication extends Application {
 
         Tab rootStartTab = new Tab("Start",rootStartVBox);
 
+        personsTable.setEditable(false);
+        personsTable.setDisable(true);
         personsTable.setPrefHeight(600.0);
 
         VBox rootPersonsVBox = new VBox(personsTable);
@@ -167,13 +174,16 @@ public class GenealogieSoftwareApplication extends Application {
         closeDatabaseButton.setDisable(false);
         saveAsDatabaseButton.setDisable(false);
         renameDatabaseButton.setDisable(false);
+        changeOwnerButton.setDisable(false);
         openDatabaseButton.setDisable(true);
         newDatabaseButton.setDisable(true);
 
         databaseInfoTab.setDisable(false);
         databaseStatisticsTab.setDisable(false);
 
-        viewDatabaseInfo();
+        personsTable.setDisable(false);
+
+        writeDatabaseInfo();
         viewDatabaseStatistics();
     }
 
@@ -213,14 +223,22 @@ public class GenealogieSoftwareApplication extends Application {
         databaseSizeLabel.setText("");
         databaseOwnerLabel.setText("");
 
+        databaseNumberOfPersonsLabel.setText("");
+        databaseNumberOfMalePersonsLabel.setText("");
+        databaseNumberOfFemalePersonsLabel.setText("");
+        databaseNumberOfFamiliesLabel.setText("");
+
         closeDatabaseButton.setDisable(true);
         saveAsDatabaseButton.setDisable(true);
         renameDatabaseButton.setDisable(true);
+        changeOwnerButton.setDisable(true);
         openDatabaseButton.setDisable(false);
         newDatabaseButton.setDisable(false);
 
         databaseInfoTab.setDisable(true);
         databaseStatisticsTab.setDisable(true);
+
+        personsTable.setDisable(true);
 
         databaseFilePath = "";
     }
@@ -241,7 +259,6 @@ public class GenealogieSoftwareApplication extends Application {
             alert.setContentText("Möchten Sie die Datenbank wirklich von '" + oldName + "' in '" + newName + "' umbenennen?");
             DialogPane dialogPane = alert.getDialogPane();
             dialogPane.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
-
             Optional<ButtonType> result2 = alert.showAndWait();
             if (result2.isPresent()) {
                 if (result2.get() == ButtonType.OK) {
@@ -250,8 +267,8 @@ public class GenealogieSoftwareApplication extends Application {
                         Statement statement = c.createStatement();
                         String sql = "UPDATE GENERAL SET NAME='" + newName + "'";
                         statement.executeUpdate(sql);
-                        viewDatabaseInfo();
                         c.close();
+                        writeDatabaseInfo();
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -279,7 +296,7 @@ public class GenealogieSoftwareApplication extends Application {
 
         databaseNameLabel.setText(name);
         databaseChangedLabel.setText(changed);
-        databaseSizeLabel.setText(size);
+        databaseSizeLabel.setText(size + " Bytes");
         databaseOwnerLabel.setText(owner);
 
     }
@@ -300,8 +317,15 @@ public class GenealogieSoftwareApplication extends Application {
                 }
             }
         }
-        double malePercentage = Precision.round((double) malesCounter / (double) personsCounter * 100, 1);
-        double femalePercentage = Precision.round((double) femalesCounter / (double) personsCounter * 100,1);
+        double malePercentage = 0.0,femalePercentage = 0.0;
+        if (personsCounter != 0) {
+            if (malesCounter != 0) {
+                malePercentage = Precision.round((double) malesCounter / (double) personsCounter * 100, 1);
+            }
+            if (femalesCounter != 0) {
+                femalePercentage = Precision.round((double) femalesCounter / (double) personsCounter * 100, 1);
+            }
+        }
         databaseNumberOfPersonsLabel.setText(Integer.toString(personsCounter));
         databaseNumberOfMalePersonsLabel.setText(malesCounter + " (" + malePercentage + "%)");
         databaseNumberOfFemalePersonsLabel.setText(femalesCounter + " (" + femalePercentage + "%)");
@@ -319,6 +343,57 @@ public class GenealogieSoftwareApplication extends Application {
 
         c.close();
 
+    }
+
+    private void writeDatabaseInfo() throws SQLException {
+        Connection c = connectDatabase();
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm");
+        String formattedDateTime = dateTime.format(formatter);
+        File file = new File(databaseFilePath);
+        String fileSize = Long.toString(file.length());
+        try(Statement statement = c.createStatement()) {
+            String sql = "UPDATE GENERAL SET CHANGEDATE='" + formattedDateTime + "'";
+            statement.executeUpdate(sql);
+            sql = "UPDATE GENERAL SET SIZE='" + fileSize + "'";
+            statement.executeUpdate(sql);
+            viewDatabaseInfo();
+            c.close();
+        }
+    }
+
+    private void changeDatabaseOwnerInfo() {
+        String oldOwner = databaseOwnerLabel.getText();
+        TextInputDialog dialog = new TextInputDialog(oldOwner);
+        dialog.setTitle("Datenbankbesitzer:in ändern");
+        dialog.setHeaderText("Geben Sie neue Informationen zum:zur Besitzer:in ein:");
+        dialog.setContentText("Besitzer:in");
+        DialogPane dialogPaneCss = dialog.getDialogPane();
+        dialogPaneCss.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+        Optional<String> result1 = dialog.showAndWait();
+        result1.ifPresent(newOwner -> {
+           Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+           alert.setTitle("Datebankbesitzer:in ändern");
+           alert.setHeaderText("Bestätigen Sie die Änderung:");
+           alert.setContentText("Möchten Sie die wirklich die Informationen zum:zur Besitzer:in der Datenbank von '" + oldOwner + "' in '" + newOwner + "' ändern?");
+           DialogPane dialogPane = alert.getDialogPane();
+           dialogPane.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+           Optional<ButtonType> result2 = alert.showAndWait();
+           if (result2.isPresent()) {
+               if (result2.get() == ButtonType.OK) {
+                   try {
+                       Connection c = connectDatabase();
+                       Statement statement = c.createStatement();
+                       String sql = "UPDATE GENERAL SET OWNER='" + newOwner + "'";
+                       statement.executeUpdate(sql);
+                       c.close();
+                       writeDatabaseInfo();
+                   } catch (SQLException e) {
+                       e.printStackTrace();
+                   }
+               }
+           }
+        });
     }
 
 }
