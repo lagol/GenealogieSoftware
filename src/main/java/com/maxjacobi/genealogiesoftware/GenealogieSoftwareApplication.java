@@ -1,6 +1,8 @@
 package com.maxjacobi.genealogiesoftware;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -207,6 +209,7 @@ public class GenealogieSoftwareApplication extends Application {
 
         writeDatabaseInfo();
         viewDatabaseStatistics();
+        viewPersonsTable();
     }
 
     private void requestDatabasePath() {
@@ -416,6 +419,32 @@ public class GenealogieSoftwareApplication extends Application {
                }
            }
         });
+    }
+
+    private void viewPersonsTable() throws SQLException {
+        ObservableList<personsTablePerson> data = FXCollections.observableArrayList();
+        Connection c = connectDatabase();
+        try(Statement statement = c.createStatement()) {
+            String sql = "SELECT NAME.GIVENNAMES,NAME.LASTNAME,PERSON.SEX,PERSON.ID,EVENT.DATE FROM PERSON,NAME,EVENT WHERE PERSON.ID = NAME.PID AND PERSON.ID = EVENT.PID AND EVENT.TYPE='birth' GROUP BY PERSON.ID";
+            try(ResultSet result = statement.executeQuery(sql)) {
+                while(result.next()) {
+                    String id = result.getString("ID");
+                    String name = result.getString("GIVENNAMES") + " " + result.getString("LASTNAME");
+                    String sex = result.getString("SEX");
+                    String birth = result.getString("DATE");
+                    String death = "";
+                    Statement deadStatement = c.createStatement();
+                    String deadSql = "SELECT DATE FROM EVENT WHERE TYPE='death' AND PID='" + id + "' LIMIT 1";
+                    ResultSet deadResult = deadStatement.executeQuery(deadSql);
+                    while(deadResult.next()) {
+                        death = deadResult.getString("DATE");
+                    }
+                    data.add(new personsTablePerson(name,sex,id,birth,death));
+                }
+            }
+        }
+        personsTable.setItems(data);
+        c.close();
     }
 
 }
