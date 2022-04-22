@@ -27,6 +27,7 @@ public class GenealogieSoftwareApplication extends Application {
     String databaseFilePath;
 
     TableView<personsTablePerson> personsTable = new TableView<>();
+    TableView<editPersonEvent> editPersonEventTableView = new TableView<>();
 
     Button closeDatabaseButton = new Button("Schließen");
     Button saveAsDatabaseButton = new Button("Speichern unter");
@@ -553,7 +554,34 @@ public class GenealogieSoftwareApplication extends Application {
         editNameOriginField.setPrefWidth(700.0);
         HBox editPersonNameOrigin = new HBox(editNameOrigin,editNameOriginField);
 
-        Tab editPersonEvents = new Tab("Ereignisse");
+        Button editPersonAddEvent = new Button("Hinzufügen");
+        Button editPersonRemoveEvent = new Button("Entfernen");
+        editPersonRemoveEvent.setOnAction(((event) -> removeEventFromPerson()));
+        ToolBar editPersonEventToolbar = new ToolBar(editPersonAddEvent,editPersonRemoveEvent);
+        editPersonEventToolbar.setPrefWidth(800);
+
+        TableColumn<editPersonEvent,String> eventTypeColumn = new TableColumn<>("Art");
+        eventTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        eventTypeColumn.setPrefWidth(75);
+        TableColumn<editPersonEvent,String> eventDateColumn = new TableColumn<>("Datum");
+        eventDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        eventDateColumn.setPrefWidth(100);
+        TableColumn<editPersonEvent,String> eventNameColumn = new TableColumn<>("Name");
+        eventNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        eventNameColumn.setPrefWidth(250);
+        TableColumn<editPersonEvent,String> eventIdColumn = new TableColumn<>("ID");
+        eventIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        eventIdColumn.setPrefWidth(75);
+        editPersonEventTableView.getColumns().add(eventTypeColumn);
+        editPersonEventTableView.getColumns().add(eventDateColumn);
+        editPersonEventTableView.getColumns().add(eventNameColumn);
+        editPersonEventTableView.getColumns().add(eventIdColumn);
+        editPersonEventTableView.setEditable(false);
+        editPersonEventTableView.setPrefWidth(800);
+
+        VBox editPersonEventsVBox = new VBox(editPersonEventToolbar,editPersonEventTableView);
+
+        Tab editPersonEvents = new Tab("Ereignisse",editPersonEventsVBox);
         Tab editPersonNames = new Tab("Namen");
         Tab editPersonSources = new Tab("Quellen");
         Tab editPersonMedia = new Tab("Medien");
@@ -784,6 +812,33 @@ public class GenealogieSoftwareApplication extends Application {
                     writeDatabaseInfo();
                     viewDatabaseStatistics();
                     viewPersonsTable();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void removeEventFromPerson() {
+        String eventId = editPersonEventTableView.getItems().get(editPersonEventTableView.getSelectionModel().getSelectedIndex()).getId();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Ereignis löschen");
+        alert.setHeaderText("Löschen bestätigen:");
+        alert.setContentText("Möchten Sie das Ereignis " + eventId + " wirklich löschen?");
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get() == ButtonType.OK) {
+                try {
+                    Connection c = connectDatabase();
+                    Statement statement = c.createStatement();
+                    String sql = "DELETE FROM EVENT WHERE ID='" + eventId + "'";
+                    statement.execute(sql);
+                    c.close();
+                    writeDatabaseInfo();
+                    viewDatabaseStatistics();
+
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
