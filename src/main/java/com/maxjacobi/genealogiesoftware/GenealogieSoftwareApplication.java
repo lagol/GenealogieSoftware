@@ -444,22 +444,30 @@ public class GenealogieSoftwareApplication extends Application {
         ObservableList<personsTablePerson> data = FXCollections.observableArrayList();
         Connection c = connectDatabase();
         try(Statement statement = c.createStatement()) {
-            String sql = "SELECT NAME.GIVENNAMES,NAME.LASTNAME,PERSON.SEX,PERSON.ID,EVENT.DATE FROM PERSON,NAME,EVENT WHERE PERSON.ID = NAME.PID AND PERSON.ID = EVENT.PID AND EVENT.TYPE='birth' GROUP BY PERSON.ID";
+            String sql = "SELECT NAME.GIVENNAMES,NAME.LASTNAME,PERSON.SEX,PERSON.ID FROM PERSON,NAME WHERE PERSON.ID = NAME.PID GROUP BY PERSON.ID";
             try(ResultSet result = statement.executeQuery(sql)) {
                 while(result.next()) {
                     String id = result.getString("ID");
                     String name = result.getString("GIVENNAMES") + " " + result.getString("LASTNAME");
                     String sex = result.getString("SEX");
-                    String birth = result.getString("DATE");
+                    String birth = "";
+                    Statement birthStatement = c.createStatement();
+                    String birthSql = "SELECT DATE FROM EVENT WHERE TYPE='birth' AND PID='" + id + "' LIMIT 1";
+                    ResultSet birthResult = birthStatement.executeQuery(birthSql);
+                    while (birthResult.next()) {
+                        birth = birthResult.getString("DATE");
+                    }
                     String death = "";
                     Statement deadStatement = c.createStatement();
                     String deadSql = "SELECT DATE FROM EVENT WHERE TYPE='death' AND PID='" + id + "' LIMIT 1";
                     ResultSet deadResult = deadStatement.executeQuery(deadSql);
-                    while(deadResult.next()) {
+                    while (deadResult.next()) {
                         death = deadResult.getString("DATE");
                     }
                     data.add(new personsTablePerson(name,sex,id,birth,death));
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
         personsTable.setItems(data);
@@ -614,7 +622,7 @@ public class GenealogieSoftwareApplication extends Application {
                     Statement statement = c.createStatement();
                     String sql = "SELECT * FROM PERSON";
                     ResultSet result = statement.executeQuery(sql);
-                    int personsCounter = 0;
+                    int personsCounter = 1;
                     while (result.next()) {
                         personsCounter++;
                     }
@@ -755,7 +763,32 @@ public class GenealogieSoftwareApplication extends Application {
     }
 
     private void removePerson() {
-
+        String personId = personsTable.getItems().get(personsTable.getSelectionModel().getSelectedIndex()).getId();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Person löschen");
+        alert.setHeaderText("Löschen bestätigen:");
+        alert.setContentText("Möchten Sie die Person " + personId + " wirklich löschen?");
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get() == ButtonType.OK) {
+                try {
+                    Connection c = connectDatabase();
+                    Statement statement = c.createStatement();
+                    String sql = "DELETE FROM NAME WHERE PID='" + personId + "'";
+                    statement.executeUpdate(sql);
+                    sql = "DELETE FROM PERSON WHERE ID='" + personId + "'";
+                    statement.executeUpdate(sql);
+                    c.close();
+                    writeDatabaseInfo();
+                    viewDatabaseStatistics();
+                    viewPersonsTable();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }
