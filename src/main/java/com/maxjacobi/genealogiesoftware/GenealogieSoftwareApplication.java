@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -555,6 +556,7 @@ public class GenealogieSoftwareApplication extends Application {
         HBox editPersonNameOrigin = new HBox(editNameOrigin,editNameOriginField);
 
         Button editPersonAddEvent = new Button("Hinzufügen");
+        editPersonAddEvent.setOnAction(((event) -> editEvent("add")));
         Button editPersonRemoveEvent = new Button("Entfernen");
         editPersonRemoveEvent.setOnAction(((event) -> removeEventFromPerson()));
         ToolBar editPersonEventToolbar = new ToolBar(editPersonAddEvent,editPersonRemoveEvent);
@@ -838,12 +840,26 @@ public class GenealogieSoftwareApplication extends Application {
                     c.close();
                     writeDatabaseInfo();
                     viewDatabaseStatistics();
-
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    private void editEvent(String how) throws SQLException {
+
+
+        VBox editEventVBox = new VBox();
+        editEventVBox.setPrefHeight(587);
+
+        BorderPane editEventBorderPane = new BorderPane();
+        editEventBorderPane.setPrefHeight(600);
+        editEventBorderPane.setCenter(editEventVBox);
+
+        Scene editEventScene = new Scene(editEventBorderPane,800,600);
+        editEventScene.getStylesheets().add(Objects.requireNonNull(GenealogieSoftwareApplication.class.getResource("stylesheet.css")).toString());
+        Stage editEventStage = new Stage();
     }
 
 }
