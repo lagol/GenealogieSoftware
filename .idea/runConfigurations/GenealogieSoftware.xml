@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="GenealogieSoftware" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.maxjacobi.genealogiesoftware.GenealogieSoftwareApplication" />
+    <module name="GenealogieSoftware" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

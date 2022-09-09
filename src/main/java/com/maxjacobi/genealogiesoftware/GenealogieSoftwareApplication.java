@@ -556,7 +556,13 @@ public class GenealogieSoftwareApplication extends Application {
         HBox editPersonNameOrigin = new HBox(editNameOrigin,editNameOriginField);
 
         Button editPersonAddEvent = new Button("Hinzufügen");
-        editPersonAddEvent.setOnAction(((event) -> editEvent("add")));
+        editPersonAddEvent.setOnAction(((event) -> {
+            try {
+                editEvent("add");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }));
         Button editPersonRemoveEvent = new Button("Entfernen");
         editPersonRemoveEvent.setOnAction(((event) -> removeEventFromPerson()));
         ToolBar editPersonEventToolbar = new ToolBar(editPersonAddEvent,editPersonRemoveEvent);
